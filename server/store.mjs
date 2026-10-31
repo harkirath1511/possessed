@@ -31,7 +31,15 @@ export class RunStore {
     const pending = previous.catch(() => {}).then(async () => {
       const target = path.join(this.directory, `${run.id}.json`);
       await writeFile(`${target}.tmp`, content, { mode: 0o600 });
-      await rename(`${target}.tmp`, target);
+      // Windows sync/indexing services can briefly hold the previous record.
+      // Preserve atomic replacement; retry only transient sharing failures.
+      for (let attempt = 0; ; attempt++) {
+        try { await rename(`${target}.tmp`, target); break; }
+        catch (error) {
+          if (!['EPERM', 'EBUSY', 'EACCES'].includes(error.code) || attempt >= 6) throw error;
+          await new Promise(resolve => setTimeout(resolve, 40 * 2 ** attempt));
+        }
+      }
     });
     this.writes.set(run.id, pending);
     await pending;

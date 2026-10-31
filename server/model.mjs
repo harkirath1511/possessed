@@ -23,7 +23,7 @@ export async function decide({ config, observation, history, signal }) {
   } else {
     const response = await fetch(`${config.ollamaUrl}/api/chat`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: config.model, messages, stream: false, format: decisionJsonSchema, options: { temperature: 0, num_predict: 420, num_ctx: 8192 }, keep_alive: '15m', think: false }), signal: combined,
+      body: JSON.stringify({ model: config.model, messages, stream: false, format: decisionJsonSchema, options: { temperature: 0, num_predict: 420, num_ctx: 4096 }, keep_alive: '5m', think: false }), signal: combined,
     });
     if (!response.ok) throw new Error(`Ollama returned HTTP ${response.status}. Confirm that ${config.model} is installed and supported.`);
     const data = await response.json();

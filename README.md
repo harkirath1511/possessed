@@ -126,7 +126,7 @@ Optional evaluation variables: `EVALUATION_BROWSER=browserbase`, `EVALUATION_URL
 
 The included `render.yaml` declares a free Node web service. Connect the repository in Render, review the blueprint, and supply its environment values. `PUBLIC_APP_URL` must match the resulting service origin. Configure hosted Gemma and Browserbase for a cloud deployment; the free service does not include a local GPU or browser binary.
 
-Build: `npm ci && npm run build`. Start: `npm start`. Health check: `/api/health`.
+Build: `npm ci --include=dev && npm run build`. Start: `npm start`. Health check: `/api/health`. Include build dependencies explicitly because `NODE_ENV=production` otherwise makes npm omit Vite and TypeScript.
 
 Public live runs require `LIVE_RUN_TOKEN`. Enter it in Connection settings to use the experiment; it stays in tab-scoped session storage. Keep public demo access to the guided sample unless you intend visitors to use your model/browser credits. The token also protects live run records and exports. Do not put secrets in public notes.
 
