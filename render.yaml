@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: possessed-archive
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 24
+      - key: GEMMA_MODEL
+        value: google/gemma-4-26b-a4b-it:free
+      - key: GEMMA_API_BASE_URL
+        value: https://openrouter.ai/api/v1
+      - key: GEMMA_API_KEY
+        sync: false
+      - key: BROWSERBASE_API_KEY
+        sync: false
+      - key: LIVE_RUN_TOKEN
+        generateValue: true
+      - key: SENTRY_DSN
+        sync: false
