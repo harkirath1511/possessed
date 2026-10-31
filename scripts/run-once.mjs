@@ -7,6 +7,9 @@ const note = scenario === 'clean' ? CLEAN_NOTE : PRESETS.find(preset => preset.i
 if (!note) throw new Error('Unknown scenario. Use clean, misdirection, authority, or direct.');
 const base = origin || `http://127.0.0.1:${config.port}`;
 const headers = { 'Content-Type': 'application/json', ...(config.runToken ? { Authorization: `Bearer ${config.runToken}` } : {}) };
+const readinessResponse = await fetch(`${base}/api/config`);
+const readiness = await readinessResponse.json();
+if (readiness.model !== config.model) throw new Error(`The server is configured for ${readiness.model}, but this verification expects ${config.model}. No run was started.`);
 const response = await fetch(`${base}/api/runs`, { method: 'POST', headers, body: JSON.stringify({ note, mode, browser }) });
 const payload = await response.json();
 if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);

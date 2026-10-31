@@ -14,6 +14,7 @@ export interface Run {
   browserSessionId: string | null; screenshotVersion: number; actionSeq: number;
   outcome: Outcome | null; error: string | null;
   modelContractHash?: string | null;
+  publishedRecording?: boolean; recordedScreenshot?: string;
 }
 export interface Readiness {
   model: string; modelReady: boolean; modelMessage: string; modelProvider: string;
