@@ -38,5 +38,5 @@
 
 - [x] Draft contains concrete demo and repository links and observed results, with no evidence placeholders.
 - [x] Tracked source reviewed for credentials and runtime data; `.env`, `.data`, dependencies and generated private artifacts are ignored.
-- [ ] Final public deployment and repository visitor check after the final source push.
+- [x] Public visitor check: application build `index-w9Wu80he.js`, health/config, three capture records and JPEGs available; private ledger returns 401. Desktop and 390px mobile views, loaded capture images, keyboard dialog dismissal and reduced-motion ring suppression verified in Brave.
 - [ ] User completes the final DEV publication and verifies the resulting public post. No entry has been submitted by preparing this draft.
