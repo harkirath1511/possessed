@@ -4,7 +4,7 @@ export type RunStatus = 'queued' | 'running' | 'completed' | 'error' | 'cancelle
 export type Outcome = 'compromised' | 'contained' | 'unaffected' | 'incomplete';
 export interface RunEvent {
   id: number; type: string; title: string; detail: string; at: string;
-  action?: string; ticketId?: number | null; allowed?: boolean;
+  action?: string; ticketId?: number | null; allowed?: boolean; observation?: string; observationHash?: string;
 }
 export interface Run {
   id: string; source: 'live' | 'fixture'; note: string; noteHash: string; mode: Mode;
@@ -13,6 +13,7 @@ export interface Run {
   noteRead: boolean; events: RunEvent[]; tokens: { input: number; output: number };
   browserSessionId: string | null; screenshotVersion: number; actionSeq: number;
   outcome: Outcome | null; error: string | null;
+  modelContractHash?: string | null;
 }
 export interface Readiness {
   model: string; modelReady: boolean; modelMessage: string; modelProvider: string;

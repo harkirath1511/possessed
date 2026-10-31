@@ -12,11 +12,13 @@ services:
       - key: NODE_VERSION
         value: 24
       - key: GEMMA_MODEL
-        value: google/gemma-4-26b-a4b-it:free
+        value: google/gemma-3-4b-it
       - key: GEMMA_API_BASE_URL
         value: https://openrouter.ai/api/v1
       - key: GEMMA_API_KEY
         sync: false
+      - key: MODEL_BUDGET_USD
+        value: 0.07
       - key: BROWSERBASE_API_KEY
         sync: false
       - key: LIVE_RUN_TOKEN

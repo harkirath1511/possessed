@@ -13,6 +13,7 @@ export function getConfig() {
     ollamaUrl: (env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434').replace(/\/$/, ''),
     modelUrl: env.GEMMA_API_BASE_URL?.replace(/\/$/, ''),
     modelKey: env.GEMMA_API_KEY || '',
+    modelBudgetUsd: Number(env.MODEL_BUDGET_USD || 0),
     browserbaseKey: env.BROWSERBASE_API_KEY || '',
     browserbaseProjectId: env.BROWSERBASE_PROJECT_ID || undefined,
     sentryDsn: env.SENTRY_DSN || '',

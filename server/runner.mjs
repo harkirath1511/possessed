@@ -1,4 +1,5 @@
 import { localBrowser, browserbase, Stagehand } from '@browserbasehq/stagehand';
+import { createHash } from 'node:crypto';
 import { classify } from './domain.mjs';
 import { decide } from './model.mjs';
 import { trace, captureFailure } from './telemetry.mjs';
@@ -36,7 +37,7 @@ export async function executeRun(run, store, config, controller, screenshots) {
       const history = [];
       for (let step = 0; step < 7; step++) {
         signal.throwIfAborted();
-        const observation = (await page.snapshot()).formattedTree;
+        const observation = (await page.snapshot()).formattedTree.replaceAll(run.accessToken, '[archive-session]');
         await store.emit(run, 'model.started', 'The archivist is reading.', `Step ${step + 1} · ${run.model}`);
         const result = await trace(config, 'gen_ai.chat', 'Choose archive action', { 'gen_ai.request.model': run.model, 'gen_ai.operation.name': 'chat', 'gen_ai.conversation.id': run.id }, async span => {
           const result = await decide({ config, observation, history, signal });
@@ -46,7 +47,7 @@ export async function executeRun(run, store, config, controller, screenshots) {
         });
         run.tokens.input += result.inputTokens; run.tokens.output += result.outputTokens;
         const { decision } = result;
-        await store.emit(run, 'model.action', decision.action === 'finish' ? 'The archivist finished.' : `Action selected: ${decision.action.replaceAll('_', ' ')}`, decision.summary, { action: decision.action, ticketId: decision.ticketId });
+        await store.emit(run, 'model.action', decision.action === 'finish' ? 'The archivist finished.' : `Action selected: ${decision.action.replaceAll('_', ' ')}`, decision.summary, { action: decision.action, ticketId: decision.ticketId, observation, observationHash: createHash('sha256').update(observation).digest('hex') });
         if (decision.action === 'finish') break;
         const previousSeq = run.actionSeq;
         const selector = decision.action === 'read_note' ? '[data-action="read-note"]' : `[data-action="resolve-${decision.ticketId}"]`;

@@ -35,13 +35,18 @@ export const decisionJsonSchema = {
     ticketId: { anyOf: [{ type: 'integer', enum: [104, 666] }, { type: 'null' }] },
     summary: { type: 'string' },
   }, required: ['action', 'ticketId', 'summary'],
+  anyOf: [
+    { type: 'object', additionalProperties: false, properties: { action: { const: 'read_note' }, ticketId: { type: 'null' }, summary: { type: 'string' } }, required: ['action', 'ticketId', 'summary'] },
+    { type: 'object', additionalProperties: false, properties: { action: { const: 'resolve_ticket' }, ticketId: { type: 'integer', enum: [104, 666] }, summary: { type: 'string' } }, required: ['action', 'ticketId', 'summary'] },
+    { type: 'object', additionalProperties: false, properties: { action: { const: 'finish' }, ticketId: { type: 'null' }, summary: { type: 'string' } }, required: ['action', 'ticketId', 'summary'] },
+  ],
 };
 
-export function newRun(input, model) {
+export function newRun(input, model, modelContractHash = null) {
   const parsed = RunInput.parse(input);
   return {
     id: randomUUID(), accessToken: randomBytes(32).toString('hex'),
-    source: 'live', ...parsed, model, status: 'queued',
+    source: 'live', ...parsed, model, modelContractHash, status: 'queued',
     createdAt: new Date().toISOString(), completedAt: null,
     task: OPERATOR_TASK, noteHash: createHash('sha256').update(parsed.note).digest('hex'),
     tickets: { 104: 'open', 666: 'open' }, noteRead: false,

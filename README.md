@@ -58,6 +58,8 @@ GEMMA_API_KEY=your-provider-key
 
 Availability and rate limits belong to the provider. A configured endpoint is not proof of a successful inference; verify a clean live run first. Never commit `.env` or paste keys into the note editor.
 
+The verified hosted route for this build is `google/gemma-3-4b-it` (paid). Paid OpenRouter calls require an explicitly approved `MODEL_BUDGET_USD`; they reserve a conservative upper cost bound in `.data/` before sending inference. The hackathon verification has a $0.10 total key-usage ceiling, with at most $0.03 reserved locally and $0.07 on Render. The app refuses paid inference if pricing, usage, or its budget record cannot be verified. No credits are purchased by the app. Free routes may be rate-limited.
+
 ### Browser
 
 **Local:** the server detects common Brave, Chrome and Chromium install paths. Set `BROWSER_EXECUTABLE_PATH` when needed. The SDK launches an isolated headless profile. Your personal tabs and cookies are not used.
@@ -105,6 +107,7 @@ Run records in `.data/` include the exact configured model identifier, input not
 
 - A model's action summary is an explanation of its selected action, not proof of why it chose it.
 - Two runs with the same input are separate generations; they can differ even at temperature zero.
+- Live comparison also matches the planner contract hash (system prompt, task, schema and generation settings), so runs from different prompt revisions are not silently paired.
 - The protected rule is a narrow capability check for this scenario, not a general prompt-injection solution.
 - The local store is durable across process restarts on a persistent filesystem. A free Render filesystem is ephemeral; export evidence before a redeploy or restart.
 - Screenshots are kept in memory for the current server session. JSON exports preserve actions and state, not image frames.

@@ -5,10 +5,12 @@ import { newRun, RunInput, publicRun, authorize } from './domain.mjs';
 import { getConfig, getReadiness } from './config.mjs';
 import { archiveHtml } from './archive.mjs';
 import { executeRun } from './runner.mjs';
+import { MODEL_CONTRACT_HASH } from './model.mjs';
 
 export function createApp({ store, configProvider = getConfig, executor = executeRun, readiness = getReadiness } = {}) {
   const app = express();
   const active = new Map();
+  const hasActiveWork = () => [...active.keys()].some(id => ['queued', 'running'].includes(store.get(id)?.status));
   const screenshots = new Map();
   const instanceId = randomUUID();
   app.disable('x-powered-by');
@@ -41,7 +43,7 @@ export function createApp({ store, configProvider = getConfig, executor = execut
   app.post('/api/runs', async (req, res) => {
     const parsed = RunInput.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: 'Provide a note of 1–2400 characters, a valid boundary mode, and a browser.' });
-    if (active.size) return res.status(409).json({ error: 'A séance is already running. Let it finish or interrupt it first.' });
+    if (hasActiveWork()) return res.status(409).json({ error: 'A séance is already running. Let it finish or interrupt it first.' });
     const config = configProvider();
     if ((process.env.RENDER || process.env.NODE_ENV === 'production') && !config.runToken) return res.status(503).json({ error: 'Set LIVE_RUN_TOKEN on the server before enabling public live runs.' });
     const ready = await readiness(config);
@@ -56,8 +58,8 @@ export function createApp({ store, configProvider = getConfig, executor = execut
     }
     if (parsed.data.browser === 'local' && !ready.localBrowserReady) return res.status(503).json({ error: 'No local browser found. Set BROWSER_EXECUTABLE_PATH or use Browserbase.' });
     // Readiness performs I/O; recheck the capacity after awaiting it.
-    if (active.size) return res.status(409).json({ error: 'A séance started while this request was checking connections.' });
-    const run = newRun(parsed.data, config.model);
+    if (hasActiveWork()) return res.status(409).json({ error: 'A séance started while this request was checking connections.' });
+    const run = newRun(parsed.data, config.model, MODEL_CONTRACT_HASH);
     const controller = new AbortController();
     active.set(run.id, controller);
     try { await store.add(run); }
